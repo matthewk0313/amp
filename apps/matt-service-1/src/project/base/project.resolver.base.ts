@@ -17,7 +17,7 @@ import * as nestAccessControl from "nest-access-control";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { Public } from "../../decorators/public.decorator";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { Project } from "./Project";
 import { ProjectCountArgs } from "./ProjectCountArgs";
@@ -35,12 +35,8 @@ export class ProjectResolverBase {
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
 
+  @Public()
   @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
-    resource: "Project",
-    action: "read",
-    possession: "any",
-  })
   async _projectsMeta(
     @graphql.Args() args: ProjectCountArgs
   ): Promise<MetaQueryPayload> {
@@ -50,26 +46,16 @@ export class ProjectResolverBase {
     };
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @Public()
   @graphql.Query(() => [Project])
-  @nestAccessControl.UseRoles({
-    resource: "Project",
-    action: "read",
-    possession: "any",
-  })
   async projects(
     @graphql.Args() args: ProjectFindManyArgs
   ): Promise<Project[]> {
     return this.service.projects(args);
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @Public()
   @graphql.Query(() => Project, { nullable: true })
-  @nestAccessControl.UseRoles({
-    resource: "Project",
-    action: "read",
-    possession: "own",
-  })
   async project(
     @graphql.Args() args: ProjectFindUniqueArgs
   ): Promise<Project | null> {
