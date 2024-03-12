@@ -7,7 +7,7 @@ export const ProjectList = (props: ListProps): React.ReactElement => {
     <List
       {...props}
       bulkActionButtons={false}
-      title={"Customers123"}
+      title={"Projects"}
       perPage={50}
       pagination={<Pagination />}
     >
