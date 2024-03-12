@@ -61,7 +61,7 @@ class ProjectOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  owner?: SortOrder;
+  ownerId?: SortOrder;
 
   @ApiProperty({
     required: false,

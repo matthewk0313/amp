@@ -49,12 +49,26 @@ export class ProjectControllerBase {
     @common.Body() data: ProjectCreateInput
   ): Promise<Project> {
     return await this.service.createProject({
-      data: data,
+      data: {
+        ...data,
+
+        owner: data.owner
+          ? {
+              connect: data.owner,
+            }
+          : undefined,
+      },
       select: {
         createdAt: true,
         id: true,
         name: true,
-        owner: true,
+
+        owner: {
+          select: {
+            id: true,
+          },
+        },
+
         startDate: true,
         updatedAt: true,
       },
@@ -76,7 +90,13 @@ export class ProjectControllerBase {
         createdAt: true,
         id: true,
         name: true,
-        owner: true,
+
+        owner: {
+          select: {
+            id: true,
+          },
+        },
+
         startDate: true,
         updatedAt: true,
       },
@@ -99,7 +119,13 @@ export class ProjectControllerBase {
         createdAt: true,
         id: true,
         name: true,
-        owner: true,
+
+        owner: {
+          select: {
+            id: true,
+          },
+        },
+
         startDate: true,
         updatedAt: true,
       },
@@ -131,12 +157,26 @@ export class ProjectControllerBase {
     try {
       return await this.service.updateProject({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          owner: data.owner
+            ? {
+                connect: data.owner,
+              }
+            : undefined,
+        },
         select: {
           createdAt: true,
           id: true,
           name: true,
-          owner: true,
+
+          owner: {
+            select: {
+              id: true,
+            },
+          },
+
           startDate: true,
           updatedAt: true,
         },
@@ -172,7 +212,13 @@ export class ProjectControllerBase {
           createdAt: true,
           id: true,
           name: true,
-          owner: true,
+
+          owner: {
+            select: {
+              id: true,
+            },
+          },
+
           startDate: true,
           updatedAt: true,
         },

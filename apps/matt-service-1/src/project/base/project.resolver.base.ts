@@ -19,6 +19,7 @@ import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
 import { Public } from "../../decorators/public.decorator";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { Project } from "./Project";
 import { ProjectCountArgs } from "./ProjectCountArgs";
 import { ProjectFindManyArgs } from "./ProjectFindManyArgs";
@@ -26,6 +27,7 @@ import { ProjectFindUniqueArgs } from "./ProjectFindUniqueArgs";
 import { CreateProjectArgs } from "./CreateProjectArgs";
 import { UpdateProjectArgs } from "./UpdateProjectArgs";
 import { DeleteProjectArgs } from "./DeleteProjectArgs";
+import { User } from "../../user/base/User";
 import { ProjectService } from "../project.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Project)
@@ -78,7 +80,15 @@ export class ProjectResolverBase {
   ): Promise<Project> {
     return await this.service.createProject({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        owner: args.data.owner
+          ? {
+              connect: args.data.owner,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -95,7 +105,15 @@ export class ProjectResolverBase {
     try {
       return await this.service.updateProject({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          owner: args.data.owner
+            ? {
+                connect: args.data.owner,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -126,5 +144,24 @@ export class ProjectResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => User, {
+    nullable: true,
+    name: "owner",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "User",
+    action: "read",
+    possession: "any",
+  })
+  async getOwner(@graphql.Parent() parent: Project): Promise<User | null> {
+    const result = await this.service.getOwner(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

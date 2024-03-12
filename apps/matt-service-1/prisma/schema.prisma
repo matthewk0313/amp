@@ -13,6 +13,7 @@ model User {
   id        String   @id @default(cuid())
   lastName  String?
   password  String
+  projects  Project?
   roles     Json
   updatedAt DateTime @updatedAt
   username  String   @unique
@@ -22,7 +23,8 @@ model Project {
   createdAt DateTime  @default(now())
   id        String    @id @default(cuid())
   name      String?   @unique
-  owner     String?
+  owner     User?     @relation(fields: [ownerId], references: [id])
+  ownerId   String?   @unique
   startDate DateTime?
   updatedAt DateTime  @updatedAt
 }
