@@ -21,11 +21,15 @@ import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { ProjectService } from "../project.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { Public } from "../../decorators/public.decorator";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { ProjectCreateInput } from "./ProjectCreateInput";
 import { Project } from "./Project";
 import { ProjectFindManyArgs } from "./ProjectFindManyArgs";
 import { ProjectWhereUniqueInput } from "./ProjectWhereUniqueInput";
 import { ProjectUpdateInput } from "./ProjectUpdateInput";
+import { TaskFindManyArgs } from "../../task/base/TaskFindManyArgs";
+import { Task } from "../../task/base/Task";
+import { TaskWhereUniqueInput } from "../../task/base/TaskWhereUniqueInput";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -60,6 +64,7 @@ export class ProjectControllerBase {
       },
       select: {
         createdAt: true,
+        dueDate: true,
         id: true,
         name: true,
 
@@ -88,6 +93,7 @@ export class ProjectControllerBase {
       ...args,
       select: {
         createdAt: true,
+        dueDate: true,
         id: true,
         name: true,
 
@@ -117,6 +123,7 @@ export class ProjectControllerBase {
       where: params,
       select: {
         createdAt: true,
+        dueDate: true,
         id: true,
         name: true,
 
@@ -168,6 +175,7 @@ export class ProjectControllerBase {
         },
         select: {
           createdAt: true,
+          dueDate: true,
           id: true,
           name: true,
 
@@ -210,6 +218,7 @@ export class ProjectControllerBase {
         where: params,
         select: {
           createdAt: true,
+          dueDate: true,
           id: true,
           name: true,
 
@@ -231,5 +240,117 @@ export class ProjectControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @common.Get("/:id/tasks")
+  @ApiNestedQuery(TaskFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Task",
+    action: "read",
+    possession: "any",
+  })
+  async findTasks(
+    @common.Req() request: Request,
+    @common.Param() params: ProjectWhereUniqueInput
+  ): Promise<Task[]> {
+    const query = plainToClass(TaskFindManyArgs, request.query);
+    const results = await this.service.findTasks(params.id, {
+      ...query,
+      select: {
+        assignedTo: {
+          select: {
+            id: true,
+          },
+        },
+
+        createdAt: true,
+        estimationDays: true,
+        id: true,
+
+        project: {
+          select: {
+            id: true,
+          },
+        },
+
+        startDate: true,
+        status: true,
+        title: true,
+        updatedAt: true,
+      },
+    });
+    if (results === null) {
+      throw new errors.NotFoundException(
+        `No resource was found for ${JSON.stringify(params)}`
+      );
+    }
+    return results;
+  }
+
+  @common.Post("/:id/tasks")
+  @nestAccessControl.UseRoles({
+    resource: "Project",
+    action: "update",
+    possession: "any",
+  })
+  async connectTasks(
+    @common.Param() params: ProjectWhereUniqueInput,
+    @common.Body() body: TaskWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      tasks: {
+        connect: body,
+      },
+    };
+    await this.service.updateProject({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Patch("/:id/tasks")
+  @nestAccessControl.UseRoles({
+    resource: "Project",
+    action: "update",
+    possession: "any",
+  })
+  async updateTasks(
+    @common.Param() params: ProjectWhereUniqueInput,
+    @common.Body() body: TaskWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      tasks: {
+        set: body,
+      },
+    };
+    await this.service.updateProject({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.Delete("/:id/tasks")
+  @nestAccessControl.UseRoles({
+    resource: "Project",
+    action: "update",
+    possession: "any",
+  })
+  async disconnectTasks(
+    @common.Param() params: ProjectWhereUniqueInput,
+    @common.Body() body: TaskWhereUniqueInput[]
+  ): Promise<void> {
+    const data = {
+      tasks: {
+        disconnect: body,
+      },
+    };
+    await this.service.updateProject({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

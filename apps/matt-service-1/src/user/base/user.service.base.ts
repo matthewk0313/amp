@@ -14,7 +14,8 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   User, // @ts-ignore
-  Project,
+  Project, // @ts-ignore
+  Task,
 } from "@prisma/client";
 
 import { PasswordService } from "../../auth/password.service";
@@ -84,5 +85,13 @@ export class UserServiceBase {
         where: { id: parentId },
       })
       .projects();
+  }
+
+  async getTasks(parentId: string): Promise<Task | null> {
+    return this.prisma.user
+      .findUnique({
+        where: { id: parentId },
+      })
+      .tasks();
   }
 }

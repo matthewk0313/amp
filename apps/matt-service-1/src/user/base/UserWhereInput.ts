@@ -16,6 +16,7 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
 import { ProjectWhereUniqueInput } from "../../project/base/ProjectWhereUniqueInput";
+import { TaskWhereUniqueInput } from "../../task/base/TaskWhereUniqueInput";
 
 @InputType()
 class UserWhereInput {
@@ -63,6 +64,18 @@ class UserWhereInput {
     nullable: true,
   })
   projects?: ProjectWhereUniqueInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => TaskWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => TaskWhereUniqueInput)
+  @IsOptional()
+  @Field(() => TaskWhereUniqueInput, {
+    nullable: true,
+  })
+  tasks?: TaskWhereUniqueInput;
 
   @ApiProperty({
     required: false,

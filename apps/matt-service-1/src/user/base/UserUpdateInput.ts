@@ -17,6 +17,7 @@ import { Type } from "class-transformer";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { TaskWhereUniqueInput } from "../../task/base/TaskWhereUniqueInput";
 
 @InputType()
 class UserUpdateInput {
@@ -74,6 +75,18 @@ class UserUpdateInput {
     nullable: true,
   })
   roles?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => TaskWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => TaskWhereUniqueInput)
+  @IsOptional()
+  @Field(() => TaskWhereUniqueInput, {
+    nullable: true,
+  })
+  tasks?: TaskWhereUniqueInput | null;
 
   @ApiProperty({
     required: false,

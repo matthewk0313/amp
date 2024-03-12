@@ -28,6 +28,7 @@ import { CreateUserArgs } from "./CreateUserArgs";
 import { UpdateUserArgs } from "./UpdateUserArgs";
 import { DeleteUserArgs } from "./DeleteUserArgs";
 import { Project } from "../../project/base/Project";
+import { Task } from "../../task/base/Task";
 import { UserService } from "../user.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => User)
@@ -96,6 +97,12 @@ export class UserResolverBase {
               connect: args.data.projects,
             }
           : undefined,
+
+        tasks: args.data.tasks
+          ? {
+              connect: args.data.tasks,
+            }
+          : undefined,
       },
     });
   }
@@ -117,6 +124,12 @@ export class UserResolverBase {
           projects: args.data.projects
             ? {
                 connect: args.data.projects,
+              }
+            : undefined,
+
+          tasks: args.data.tasks
+            ? {
+                connect: args.data.tasks,
               }
             : undefined,
         },
@@ -157,6 +170,25 @@ export class UserResolverBase {
   })
   async getProjects(@graphql.Parent() parent: User): Promise<Project | null> {
     const result = await this.service.getProjects(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Task, {
+    nullable: true,
+    name: "tasks",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Task",
+    action: "read",
+    possession: "any",
+  })
+  async getTasks(@graphql.Parent() parent: User): Promise<Task | null> {
+    const result = await this.service.getTasks(parent.id);
 
     if (!result) {
       return null;

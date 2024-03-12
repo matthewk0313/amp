@@ -14,6 +14,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import {
   Prisma,
   Project, // @ts-ignore
+  Task, // @ts-ignore
   User,
 } from "@prisma/client";
 
@@ -50,6 +51,17 @@ export class ProjectServiceBase {
     args: Prisma.SelectSubset<T, Prisma.ProjectDeleteArgs>
   ): Promise<Project> {
     return this.prisma.project.delete(args);
+  }
+
+  async findTasks(
+    parentId: string,
+    args: Prisma.TaskFindManyArgs
+  ): Promise<Task[]> {
+    return this.prisma.project
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .tasks(args);
   }
 
   async getOwner(parentId: string): Promise<User | null> {

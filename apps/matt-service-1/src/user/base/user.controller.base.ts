@@ -55,6 +55,12 @@ export class UserControllerBase {
               connect: data.projects,
             }
           : undefined,
+
+        tasks: data.tasks
+          ? {
+              connect: data.tasks,
+            }
+          : undefined,
       },
       select: {
         createdAt: true,
@@ -69,6 +75,13 @@ export class UserControllerBase {
         },
 
         roles: true,
+
+        tasks: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         username: true,
       },
@@ -104,6 +117,13 @@ export class UserControllerBase {
         },
 
         roles: true,
+
+        tasks: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         username: true,
       },
@@ -140,6 +160,13 @@ export class UserControllerBase {
         },
 
         roles: true,
+
+        tasks: {
+          select: {
+            id: true,
+          },
+        },
+
         updatedAt: true,
         username: true,
       },
@@ -179,6 +206,12 @@ export class UserControllerBase {
                 connect: data.projects,
               }
             : undefined,
+
+          tasks: data.tasks
+            ? {
+                connect: data.tasks,
+              }
+            : undefined,
         },
         select: {
           createdAt: true,
@@ -193,6 +226,13 @@ export class UserControllerBase {
           },
 
           roles: true,
+
+          tasks: {
+            select: {
+              id: true,
+            },
+          },
+
           updatedAt: true,
           username: true,
         },
@@ -237,6 +277,13 @@ export class UserControllerBase {
           },
 
           roles: true,
+
+          tasks: {
+            select: {
+              id: true,
+            },
+          },
+
           updatedAt: true,
           username: true,
         },

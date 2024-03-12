@@ -27,6 +27,8 @@ import { ProjectFindUniqueArgs } from "./ProjectFindUniqueArgs";
 import { CreateProjectArgs } from "./CreateProjectArgs";
 import { UpdateProjectArgs } from "./UpdateProjectArgs";
 import { DeleteProjectArgs } from "./DeleteProjectArgs";
+import { TaskFindManyArgs } from "../../task/base/TaskFindManyArgs";
+import { Task } from "../../task/base/Task";
 import { User } from "../../user/base/User";
 import { ProjectService } from "../project.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
@@ -144,6 +146,26 @@ export class ProjectResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Task], { name: "tasks" })
+  @nestAccessControl.UseRoles({
+    resource: "Task",
+    action: "read",
+    possession: "any",
+  })
+  async findTasks(
+    @graphql.Parent() parent: Project,
+    @graphql.Args() args: TaskFindManyArgs
+  ): Promise<Task[]> {
+    const results = await this.service.findTasks(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)

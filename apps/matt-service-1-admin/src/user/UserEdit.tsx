@@ -12,6 +12,7 @@ import {
 } from "react-admin";
 
 import { ProjectTitle } from "../project/ProjectTitle";
+import { TaskTitle } from "../task/TaskTitle";
 import { ROLES_OPTIONS } from "../user/RolesOptions";
 
 export const UserEdit = (props: EditProps): React.ReactElement => {
@@ -34,6 +35,9 @@ export const UserEdit = (props: EditProps): React.ReactElement => {
           optionText="label"
           optionValue="value"
         />
+        <ReferenceInput source="tasks.id" reference="Task" label="Tasks">
+          <SelectInput optionText={TaskTitle} />
+        </ReferenceInput>
         <TextInput label="Username" source="username" />
       </SimpleForm>
     </Edit>

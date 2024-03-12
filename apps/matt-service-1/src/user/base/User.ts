@@ -17,6 +17,7 @@ import { Project } from "../../project/base/Project";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { Task } from "../../task/base/Task";
 
 @ObjectType()
 class User {
@@ -73,6 +74,15 @@ class User {
   @IsJSONValue()
   @Field(() => GraphQLJSON)
   roles!: JsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => Task,
+  })
+  @ValidateNested()
+  @Type(() => Task)
+  @IsOptional()
+  tasks?: Task | null;
 
   @ApiProperty({
     required: true,
